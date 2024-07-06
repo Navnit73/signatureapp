@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Sign</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .canvas {
+            border: 2px solid black;
+            border-radius: 5px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .control-group p {
+            margin: 0 0 5px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #f1c40f;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <p>Text Color Picker</p>
+                <input type="color" id="colorpicker">
+            </div>
+            <div class="control-group">
+                <p>Background</p>
+                <input type="color" id="canvascolor">
+            </div>
+            <div class="control-group">
+                <p>Font Size</p>
+                <select id="fontSize">
+                    <option value="5">5px</option>
+                    <option value="10">10px</option>
+                    <option value="15">15px</option>
+                    <option value="20">20px</option>
+                    <option value="30">30px</option>
+                    <option value="40">40px</option>
+                </select>
+            </div>
+        </div>
+
+        <canvas class="canvas" id="myCanvas" width="800" height="500"></canvas>
+
+        <div class="buttons">
+            <button type="button" class="btn btn-danger" id="clearbutton">Clear</button>
+            <button type="button" class="btn btn-success" id="savebutton">Save and Download</button>
+            <button type="button" class="btn btn-warning" id="retrievebutton">Retrieve Saved Signature</button>
+        </div>
+    </div>
+    <script>
+        const colorpicker = document.getElementById("colorpicker");
+        const canvascolor = document.getElementById("canvascolor");
+        const canvas = document.getElementById("myCanvas");
+        const clearbutton = document.getElementById("clearbutton");
+        const savebutton = document.getElementById("savebutton");
+        const retrievebutton = document.getElementById("retrievebutton");
+        const fontSize = document.getElementById("fontSize");
+        const ctx = canvas.getContext("2d");
+
+        let drawing = false;
+
+        canvascolor.addEventListener("change", function() {
+            canvas.style.backgroundColor = canvascolor.value;
+        });
+
+        colorpicker.addEventListener("change", function() {
+            ctx.strokeStyle = colorpicker.value;
+        });
+
+        fontSize.addEventListener("change", function() {
+            ctx.lineWidth = fontSize.value;
+        });
+
+        canvas.addEventListener("mousedown", function() {
+            drawing = true;
+            ctx.beginPath();
+        });
+
+        canvas.addEventListener("mouseup", function() {
+            drawing = false;
+        });
+
+        canvas.addEventListener("mousemove", function(event) {
+            if (!drawing) return;
+            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.stroke();
+        });
+
+        clearbutton.addEventListener("click", function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        savebutton.addEventListener("click", function() {
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "signature.png";
+            link.click();
+        });
+
+        retrievebutton.addEventListener("click", function() {
+            // Example code for retrieving the saved signature
+            // In a real-world application, you would fetch the image from a server or local storage
+            const savedImage = new Image();
+            savedImage.src = "path_to_saved_image.png"; // Replace with actual path
+            savedImage.onload = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(savedImage, 0, 0, canvas.width, canvas.height);
+            };
+        });
+    </script>
+</body>
+</html>
